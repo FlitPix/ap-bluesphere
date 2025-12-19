@@ -5,7 +5,7 @@ Completing Special Stages grants location hints.
 
 ## How to play
 
-Players can refer to the [game page](/docs/en_Blue Sphere.md), then the [setup guide](/docs/setup_en.md).
+Players can refer to the [game page](</docs/en_Blue Sphere.md>), then the [setup guide](/docs/setup_en.md).
 
 ## Support
 
