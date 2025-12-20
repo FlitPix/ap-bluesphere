@@ -36,9 +36,6 @@ class BlueSphereClient(BizHawkClient):
         self.stage_cleared = -1 # TODO: switch to IntEnum?
         self.stage_perfected = False
 
-    async def peek_rom(self, ctx: "BizHawkClientContext", address: int, size: int) -> bytes:
-        return (await bizhawk.read(ctx.bizhawk_ctx, [(address, size, "MD CART")]))[0]
-
     def get_ram_addr(self, name: str) -> int:
         if name in RAM_ADDRS:
             return RAM_ADDRS[name]
@@ -55,12 +52,18 @@ class BlueSphereClient(BizHawkClient):
             if await bizhawk.get_memory_size(ctx.bizhawk_ctx, "MD CART") != 2621440: return False
 
             # check rom names in headers for both S&K and locked-on game
-            rom_name_sk = (await self.peek_rom(ctx, 0x150, 16)).decode("ascii")
+            rom_names = await bizhawk.read(ctx.bizhawk_ctx, [
+                (0x150, 16, "MD CART"),
+                (0x200150, 32, "MD CART")
+            ])
+            if rom_names is not None:
+                rom_name_sk = rom_names[0].decode("ascii")
+                rom_name_locked_on = rom_names[1].decode("ascii")
+            else: return False
             if not rom_name_sk.startswith("SONIC & KNUCKLES"):
-                logger.error("This doesn't appear to be a vanilla Blue Sphere ROM (base ROM is not vanilla S&K).")
+                logger.error("This doesn't seem to be a vanilla Blue Sphere ROM (base ROM is not vanilla S&K).")
                 return False
-            rom_name_s1 = (await self.peek_rom(ctx, 0x200150, 32)).decode("ascii")
-            if not rom_name_s1.startswith("SONIC THE               HEDGEHOG"):
+            if not rom_name_locked_on.startswith("SONIC THE               HEDGEHOG"):
                 logger.error("You appear to have locked-on an unsupported game, if any. "
                             "Currently, only Sonic 1 is supported; please lock-on a Sonic 1 ROM.")
                 return False
