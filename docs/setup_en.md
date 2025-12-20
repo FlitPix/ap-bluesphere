@@ -15,9 +15,9 @@ As we are using BizHawk, this guide is only applicable to Windows and Linux syst
 - The latest version of [BizHawk](https://tasvideos.org/BizHawk/ReleaseHistory)
     - Versions 2.10 and above are known to work.
     - Versions 2.9 and below will **not** work.
-- The latest version of [upstream Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases/latest), AND
-the latest version of the [Blue Sphere APWorld](https://github.com/FlitPix/ap-bluesphere/releases/latest)
-    - Some forks will already include the APWorld. In this case, you don't need to download it.
+- The latest version of [upstream Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases/latest)
+(or any desired fork), AND the latest version of the [Blue Sphere APWorld](https://github.com/FlitPix/ap-bluesphere/releases/latest)
+    - Some Archipelago forks may already include the APWorld. In this case, you don't need to download it.
 - Your legally-obtained Blue Sphere ROM for Sega Genesis / Mega Drive. This cannot be provided by Flit or the Archipelago
 community.
     - Other versions, such as Sonic Mania/Origins's Blue Sphere, are not supported at this time.
@@ -28,9 +28,9 @@ community.
         `cat s&k.md s1.md > bluesphere.md`
         - Blue Sphere is included in the GameCube version of Sonic Mega Collection.
         Follow [this guide](https://sethmlarson.dev/extracting-genesis-and-game-gear-roms-from-sega-gamecube-collections#sonic-mega-collection)
-        to extract it.
+        to extract it. (Note that I did not write or test the instructions in this guide, let me know if it doesn't work.)
 
-## Configuring BizHawk
+## Installing and configuring BizHawk
 
 Follow TASVideos's instructions to install and configure BizHawk. This is not in the scope of this setup guide.
 
