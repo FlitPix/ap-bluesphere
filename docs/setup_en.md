@@ -13,6 +13,8 @@ As we are using BizHawk, this guide is only applicable to Windows and Linux syst
 ## Required software
 
 - The latest version of [BizHawk](https://tasvideos.org/BizHawk/ReleaseHistory)
+    - Versions 2.10 and above are known to work.
+    - Versions 2.9 and below will **not** work.
 - The latest version of [upstream Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases/latest), AND
 the latest version of the [Blue Sphere APWorld](https://github.com/FlitPix/ap-bluesphere/releases/latest)
     - Some forks will already include the APWorld. In this case, you don't need to download it.
