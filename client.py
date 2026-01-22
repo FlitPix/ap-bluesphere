@@ -26,15 +26,12 @@ RAM_ADDRS: dict[int] = {
 class BlueSphereClient(BizHawkClient):
     game = "Blue Sphere"
     system = "GEN"
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.hints: dict
-        self.scouted_locations: list
-        self.game_started = False
-        self.stage_started = False
-        self.stage_cleared = -1 # TODO: switch to IntEnum?
-        self.stage_perfected = False
+    hints: dict
+    scouted_locations: list
+    game_started: bool = False
+    stage_started: bool = False
+    stage_cleared: int = -1 # TODO: switch to IntEnum?
+    stage_perfected: bool = False
 
     def get_ram_addr(self, name: str) -> int:
         if name in RAM_ADDRS:
@@ -89,25 +86,27 @@ class BlueSphereClient(BizHawkClient):
                 "keys": [f"_read_hints_{ctx.team}_{ctx.slot}"]
             }]))
             # scouting all missing locations is necessary to weigh item classifications
-            async_start(ctx.send_msgs([{
-                "cmd": "LocationScouts",
-                "locations": list(ctx.missing_locations),
-                "create_as_hint": 0
-            }]))
+            # async_start(ctx.send_msgs([{
+            #     "cmd": "LocationScouts",
+            #     "locations": list(ctx.missing_locations),
+            #     "create_as_hint": 0
+            # }]))
+
         elif cmd == "Retrieved":
             if f"_read_hints_{ctx.team}_{ctx.slot}" in args["keys"]:
                 self.hints = args["keys"][f"_read_hints_{ctx.team}_{ctx.slot}"]
                 print(self.hints)
+
         elif cmd == "SetReply":
             if f"_read_hints_{ctx.team}_{ctx.slot}" in args["key"]:
                 self.hints = args["value"]
                 print(self.hints)
+
         elif cmd == "LocationInfo":
             if args["locations"] is not None:
                 self.scouted_locations = args["locations"]
-    
-    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
 
+    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         if ctx.server is None or ctx.server.socket.closed or ctx.slot_data is None:
             return
 
@@ -128,37 +127,31 @@ class BlueSphereClient(BizHawkClient):
             if (spheres_left > 0 or rings_left > 0 or stage_result > 0) and not self.game_started:
                 self.game_started = True
                 logger.info("Game started!")
-            
-            if self.game_started:
 
-                # detect stage start
+            if self.game_started:
                 if current_character != 0 and self.stage_cleared != 0:
                     self.stage_started = True
                     self.stage_cleared = 0
                     logger.info("Get Blue Spheres!")
 
                 if self.stage_started:
-
-                    # red sphere touched, stage lost
                     if current_character == 0 and stage_result != 4:
                         self.stage_started = False
                         self.stage_perfected = False
                         self.stage_cleared = -1
                         logger.info("Stage lost...")
-                    
-                    # detect perfect
+
                     if rings_left == 0 and spheres_left != 0 and not self.stage_perfected:
                         self.stage_perfected = True
                         logger.info("PERFECT!")
-                
-                    if current_character == 0 and stage_result == 4 and self.stage_cleared == 0:
 
+                    if current_character == 0 and stage_result == 4 and self.stage_cleared == 0:
                         match self.stage_perfected:
                             case False:
                                 self.stage_cleared = 1
                             case True:
                                 self.stage_cleared = 2
-                        
+
                         logger.info("CONGRATULATIONS!")
 
                         if self.hints == None:
@@ -170,9 +163,9 @@ class BlueSphereClient(BizHawkClient):
                             "cmd": "CreateHints",
                             "locations": choices(list(hintable_locs))
                         }])
-                        
+
                         self.stage_started = False
                         self.stage_perfected = False
-                    
+
         except bizhawk.RequestFailedError:
             pass
