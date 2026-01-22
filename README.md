@@ -23,3 +23,5 @@ Archipelago webhosts and forks are welcome to incorporate this APWorld, no need 
 
 - **[Flit](https://flitpix.net):** Author
 - **[HintMachine](https://github.com/HintMachine/hintMachine):** Inspiration
+
+Blue Sphere Archipelago is dedicated to my late grandpa, who passed away in November 2025.
