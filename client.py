@@ -23,6 +23,25 @@ RAM_ADDRS: dict[int] = {
     # "LEVEL_DIFFICULTY": 0xFFAD # int starting from 0
 }
 
+def cmd_toggle_ringlink(self: "BizHawkClientCommandProcessor") -> None:
+    """
+    Toggle Ring Link on or off.
+    """
+    ctx = self.ctx
+    if not ctx.server or not ctx.slot:
+        logger.warning("You must be connected to a server to use this command.")
+        return
+    if "RingLink" not in ctx.tags:
+        ctx.tags.add("RingLink")
+        logger.info("Ring Link enabled.")
+    else:
+        ctx.tags.remove("RingLink")
+        logger.info("Ring Link disabled.")
+    async_start(ctx.send_msgs([{
+        "cmd": "ConnectUpdate",
+        "tags": ctx.tags
+    }]))
+
 class BlueSphereClient(BizHawkClient):
     game = "Blue Sphere"
     system = "GEN"
@@ -36,6 +55,23 @@ class BlueSphereClient(BizHawkClient):
     def get_ram_addr(self, name: str) -> int:
         if name in RAM_ADDRS:
             return RAM_ADDRS[name]
+    
+    async def send_ring_link(self, ctx: "BizHawkClientContext", amount: int) -> None:
+        if "RingLink" not in ctx.tags:
+            return
+        
+        if not hasattr(self, "instance_id"):
+            self.instance_id = time.time()
+        
+        await ctx.send_msgs([{
+            "cmd": "Bounce",
+            "tags": ["RingLink"],
+            "data": {
+                "time": time.time(),
+                "source": self.instance_id,
+                "amount": amount
+            }
+        }])
 
     async def broadcast_hint(self, ctx: "BizHawkClientContext", locations: list[int]) -> None:
         await ctx.send_msgs([{
@@ -72,6 +108,7 @@ class BlueSphereClient(BizHawkClient):
         ctx.tags = {"AP", "HintGame"}
         ctx.items_handling = 0b000
         ctx.watcher_timeout = 0.125
+        ctx.command_processor.commands["ringlink"] = cmd_toggle_ringlink
 
         return True
 
@@ -106,6 +143,8 @@ class BlueSphereClient(BizHawkClient):
             if args["locations"] is not None:
                 self.scouted_locations = args["locations"]
 
+        # RingLink packets are ignored.
+    
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         if ctx.server is None or ctx.server.socket.closed or ctx.slot_data is None:
             return
